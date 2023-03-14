@@ -27,7 +27,7 @@ class LabelWebsiteApplicationTests {
 //		user.setFirstName("zeqing");
 //		user.setLastName("wang");
 //		userMapper.insert(user);
-		System.out.println(userService.insertLabelWithUserId(1, "kitchen"));
+		System.out.println(userService.insertLabelWithUserId(1, "fist"));
 	}
 
 

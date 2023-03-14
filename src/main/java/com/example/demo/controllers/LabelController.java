@@ -2,9 +2,7 @@ package com.example.demo.controllers;
 
 import com.example.demo.controllers.utils.R;
 import com.example.demo.domain.Label;
-import com.example.demo.domain.User;
 import com.example.demo.services.ILabelService;
-import com.example.demo.services.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,8 +27,8 @@ public class LabelController {
     }
 
     @PutMapping
-    public R updateById(@RequestBody Label labe) {
-        labelService.updateById(labe);
+    public R updateById(@RequestBody Label label) {
+        labelService.updateById(label);
         return new R(true, "You have successfully updated the label!");
     }
 

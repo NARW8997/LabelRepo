@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.demo.domain.User;
 import com.example.demo.domain.UserWithLabels;
 
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 
 public interface IUserService extends IService<User> {
@@ -13,4 +14,7 @@ public interface IUserService extends IService<User> {
 
     Boolean removeLabel(Integer uid, Integer lid);
 
+//    void storeUserInSession(HttpSession session, Integer uid);
+//
+//    UserWithLabels getUserFromSession(HttpSession session);
 }

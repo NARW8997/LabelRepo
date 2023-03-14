@@ -13,6 +13,7 @@ import com.example.demo.services.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @Service
@@ -58,5 +59,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         Integer ulRes = userLabelMapper.deleteByUserIdAndLabelId(uid, lid);
         return lRes > 0 && ulRes > 0;
     }
+
+//    @Override
+//    public void storeUserInSession(HttpSession session, Integer uid) {
+//        UserWithLabels userWithLabels = getUserWithLabels(uid);
+//        session.setAttribute("userWithLabels", userWithLabels);
+//    }
+//
+//    @Override
+//    public UserWithLabels getUserFromSession(HttpSession session) {
+//        return (UserWithLabels) session.getAttribute("userWithLabels");
+//    }
 
 }
