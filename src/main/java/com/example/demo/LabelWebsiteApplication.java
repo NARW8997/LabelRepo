@@ -10,8 +10,8 @@ import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.session.config.annotation.web.http.EnableSpringHttpSession;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Arrays;
@@ -38,6 +38,18 @@ public class LabelWebsiteApplication {
 //	@EnableSpringHttpSession
 //	public class HttpSessionConfig {
 //	}
+
+	@Configuration
+	public class MvcConfig implements WebMvcConfigurer {
+		public void addViewControllers(ViewControllerRegistry registry) {
+			registry.addViewController("login").setViewName("login");
+			registry.addViewController("/").setViewName("login");
+			registry.addViewController("register").setViewName("register");
+			registry.addViewController("home").setViewName("home");
+			registry.addViewController("addEmp").setViewName("addEmp");
+			registry.addViewController("updateEmp").setViewName("updateEmp");
+		}
+	}
 
 	@Configuration
 	public class InterceptorConfig implements WebMvcConfigurer {

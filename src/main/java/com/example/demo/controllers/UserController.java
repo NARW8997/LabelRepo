@@ -8,15 +8,19 @@ import com.example.demo.domain.UserWithLabels;
 import com.example.demo.services.ILabelService;
 import com.example.demo.services.ILoginService;
 import com.example.demo.services.IUserService;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
+@Transactional
 @RestController
 @RequestMapping("user/")
 public class UserController {
@@ -65,49 +69,64 @@ public class UserController {
         return new R(true, userWithLabels);
     }
 
-    @GetMapping("insertLabel/{labelName}")
-    public R insertLabelByUser(@PathVariable String labelName, HttpSession session) {
+    @PostMapping("insertLabel")
+    public ModelAndView insertLabelByUser(@RequestParam String labelName, HttpSession session) {
+        log.info("label name {}", labelName);
+        ModelAndView mv = new ModelAndView();
         if (checkSessionWithUserLabels(session)) {
-            return new R(false, "Session Error!");
+            mv.setViewName("redirect:/addEmp");
+            return mv;
         }
         UserWithLabels userWithLabels = (UserWithLabels) session.getAttribute("userWithLabels");
         int uid = userWithLabels.getUser().getId();
         Boolean res = userService.insertLabelWithUserId(uid, labelName);
         if (res) {
             setAttribute(session, userService.getUserWithLabels(uid));
-            return new R(true, "Insert Success!");
+            mv.setViewName("redirect:/home");
+            return mv;
         }
-        return new R(false, "Insert Failed!");
+        mv.setViewName("redirect:/addEmp");
+        return mv;
     }
 
-    @DeleteMapping("removeLabel/{lid}")
-    public R removeLabelByUserAndLabelId(@PathVariable Integer lid, HttpSession session) {
+    @GetMapping("removeLabel")
+    public ModelAndView removeLabelByUserAndLabelId(@RequestParam Integer lid, HttpSession session) {
+        ModelAndView mv = new ModelAndView();
         if (checkSessionWithUserLabels(session)) {
-            return new R(false, "Session Error!");
+            mv.setViewName("redirect:/home");
+            return mv;
         }
         UserWithLabels userWithLabels = (UserWithLabels) session.getAttribute("userWithLabels");
         int uid = userWithLabels.getUser().getId();
         Boolean res = userService.removeLabel(uid, lid);
         if (res) {
             setAttribute(session, userService.getUserWithLabels(uid));
-            return new R(true, "You have removed a label!");
+            mv.setViewName("redirect:/home");
+            return mv;
         }
-        return new R(false, "Remove failed");
+        mv.setViewName("redirect:/home");
+        return mv;
     }
 
-    @PutMapping("updateLabel")
-    public R updateLabelByUser(@RequestBody Label label, HttpSession session) {
+    @GetMapping("updateLabel")
+    public ModelAndView updateLabelByUser(@RequestParam Integer id, @RequestParam String labelName, HttpSession session) {
+        ModelAndView mv = new ModelAndView();
         if (checkSessionWithUserLabels(session)) {
-            return new R(false, "Session Error!");
+            mv.setViewName("redirect:/updateEmp");
+            return mv;
         }
         UserWithLabels userWithLabels = (UserWithLabels) session.getAttribute("userWithLabels");
         int uid = userWithLabels.getUser().getId();
+        Label label = labelService.getById(id);
+        label.setName(labelName);
         boolean res = labelService.updateById(label);
         if (res) {
             setAttribute(session, userService.getUserWithLabels(uid));
-            return new R(true, "You have updated a label!");
+            mv.setViewName("redirect:/home");
+            return mv;
         }
-        return new R(false, "Remove failed");
+        mv.setViewName("redirect:/updateEmp");
+        return mv;
     }
 
     @GetMapping("/displayLabel")
@@ -118,23 +137,27 @@ public class UserController {
         UserWithLabels userWithLabels = (UserWithLabels) session.getAttribute("userWithLabels");
         if (userWithLabels != null) {
             List<Label> labels = userWithLabels.getLabelList();
-            model.addAttribute("user", userWithLabels.getUser());
+            model.addAttribute("user", userWithLabels.getUser().getUsername());
             model.addAttribute("labels", labels);
             return new R(true, userWithLabels);
         }
         return new R(false);
     }
 
-    @PostMapping("login")
-    public R userLogin(@RequestBody LoginQuery query, HttpSession session) {
-        log.info("dashboard login username#{} password#{}", query.getUsername(), query.getPassword());
+    @PostMapping("/login")
+    public ModelAndView userLogin(@RequestParam String username, @RequestParam String password, HttpSession session) {
+        log.info("dashboard login username#{} password#{}", username, password);
+        ModelAndView mv = new ModelAndView();
+        LoginQuery query = new LoginQuery(username, password);
         UserWithLabels userWithLabels = loginService.login(query);
         if (userWithLabels == null) {
-            return new R(false, "Username Or Password Wrong!");
+            mv.setViewName("redirect:/login");
+            return mv;
         }
         removeAttribute(session);
         setAttribute(session, userWithLabels);
-        return new R(true, "Login Success!");
+        mv.setViewName("redirect:/home");
+        return mv;
     }
 
     private void setAttribute(HttpSession session, UserWithLabels userWithLabels) {
@@ -147,10 +170,32 @@ public class UserController {
     }
 
 
-    @PostMapping("/logout")
-    public R logout(HttpSession session) {
+    @GetMapping("/logout")
+    public ModelAndView logout(HttpSession session) {
+        ModelAndView mv = new ModelAndView();
         removeAttribute(session);
-        return new R(true, "session removed!");
+        session.invalidate();
+        mv.setViewName("redirect:/login");
+        return mv;
+    }
+
+    @PostMapping("/register")
+    public ModelAndView register(@RequestParam String username, @RequestParam String password,
+                           @RequestParam String firstName, @RequestParam String lastName) {
+        log.debug("username: {}, password: {}", username, password);
+        ModelAndView mv = new ModelAndView();
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(password);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        Boolean res = userService.register(user);
+        if (res) {
+            mv.setViewName("redirect:/login");
+            return mv;
+        }
+        mv.setViewName("redirect:/register");
+        return mv;
     }
 
     private void removeAttribute(HttpSession session) {
@@ -159,7 +204,9 @@ public class UserController {
         }
     }
 
+
     private boolean checkSessionWithUserLabels(HttpSession session) {
         return session == null || session.getAttribute("userWithLabels") == null;
     }
+
 }

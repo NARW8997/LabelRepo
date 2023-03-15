@@ -29,6 +29,4 @@ class LabelWebsiteApplicationTests {
 //		userMapper.insert(user);
 		System.out.println(userService.insertLabelWithUserId(1, "fist"));
 	}
-
-
 }

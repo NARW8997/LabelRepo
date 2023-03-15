@@ -12,6 +12,7 @@ import com.example.demo.services.IUserLabelService;
 import com.example.demo.services.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -25,6 +26,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     @Autowired
     private UserLabelMapper userLabelMapper;
 
+    @Autowired
+    private UserMapper userMapper;
 
     @Override
     public UserWithLabels getUserWithLabels(Integer uid) {
@@ -55,20 +58,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     @Override
     public Boolean removeLabel(Integer uid, Integer lid) {
-        int lRes = labelMapper.deleteById(lid);
         Integer ulRes = userLabelMapper.deleteByUserIdAndLabelId(uid, lid);
+        int lRes = labelMapper.deleteById(lid);
         return lRes > 0 && ulRes > 0;
     }
 
-//    @Override
-//    public void storeUserInSession(HttpSession session, Integer uid) {
-//        UserWithLabels userWithLabels = getUserWithLabels(uid);
-//        session.setAttribute("userWithLabels", userWithLabels);
-//    }
-//
-//    @Override
-//    public UserWithLabels getUserFromSession(HttpSession session) {
-//        return (UserWithLabels) session.getAttribute("userWithLabels");
-//    }
-
+    @Override
+    public Boolean register(User user) {
+        User found = userMapper.getByUsername(user.getUsername());
+        if (!ObjectUtils.isEmpty(found) || found != null) {
+            return false;
+        }
+        int res = userMapper.insert(user);
+        return res > 0;
+    }
 }

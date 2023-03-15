@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" th:href="@{css/style.css}" />
+    <title>Dashboard</title>
+</head>
+<body>
+    <div id="wrap">
+        <div id="top_content">
+            <div id="header">
+                <div id="rightheader">
+                    <p>
+                        2023/3/14
+                        <br />
+                        <a th:href="@{/user/logout}">Logout</a>
+                    </p>
+                </div>
+                <div id="topheader">
+                    <h1 id="title">
+                        <a th:href="@{/home}">main</a>
+                    </h1>
+                </div>
+                <div id="navigation">
+                </div>
+            </div>
+            <div id="content">
+                <p id="whereami">
+                </p>
+                <h1>
+                    Welcome, <span th:if="${session.userWithLabels != null}" th:text="${session.userWithLabels.getUser().getUsername()}"></span>
+                    <span th:if="${session.userWithLabels==null}">Guest</span>
+                </h1>
+                <table class="table">
+                    <tr class="table_header">
+                        <td>
+                            id
+                        </td>
+                        <td>
+                            name
+                        </td>
+                        <td>
+                            operation
+                        </td>
+                    </tr>
+                    <tr th:each="label, state:${session.userWithLabels.getLabelList()}" th:class="${state.odd ? 'row1' : 'row2'}">
+                        <td>
+                            <span th:text="${label.getId()}"></span>
+                        </td>
+                        <td>
+                            <span th:text="${label.getName()}"></span>
+                        </td>
+                        <td>
+                            <a th:href="@{/user/removeLabel(lid=${label.getId()})}">Delete</a>&nbsp;<a th:href="@{/label/detail(id=${label.getId()})}">Update</a>
+                        </td>
+                    </tr>
+                </table>
+                <p>
+                    <input type="button" class="button" value="Add" onclick="addEmp()"/>
+                    <script>
+                        function addEmp() {
+                            location.href = '[[@{/addEmp}]]';
+                        }
+                    </script>
+                </p>
+            </div>
+        </div>
+        <div id="footer">
+            <div id="footer_bg">
+                ABC@gmail.com
+            </div>
+        </div>
+    </div>
+</body>
+</html>

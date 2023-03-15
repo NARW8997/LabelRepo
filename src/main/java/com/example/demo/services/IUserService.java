@@ -17,4 +17,5 @@ public interface IUserService extends IService<User> {
 //    void storeUserInSession(HttpSession session, Integer uid);
 //
 //    UserWithLabels getUserFromSession(HttpSession session);
+    Boolean register(User user);
 }

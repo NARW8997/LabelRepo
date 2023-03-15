@@ -4,7 +4,9 @@ import com.example.demo.controllers.utils.R;
 import com.example.demo.domain.Label;
 import com.example.demo.services.ILabelService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 @RestController
 @RequestMapping("label/")
@@ -36,5 +38,15 @@ public class LabelController {
     public R getById(@PathVariable Integer id) {
         Label label = labelService.getById(id);
         return new R(true, label);
+    }
+
+    @GetMapping("detail")
+    public ModelAndView getLabelDetail(@RequestParam Integer id) {
+        Label label = labelService.getById(id);
+        ModelAndView mv = new ModelAndView();
+//        model.addAttribute("label", label);
+        mv.setViewName("updateEmp");
+        mv.addObject("label", label);
+        return mv;
     }
 }
